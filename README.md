@@ -13,11 +13,11 @@ npm install --save-dev gulp-ejs-template
 ## Usage
 
 ```js
-var ejsTemplate = require('gulp-ejs-template');
+var gulpEjs = require('gulp-ejs-template');
 
 gulp.task('ejsTemplate', function () {
   return gulp.src('test/fixtures/*.html')
-  .pipe(ejsTemplate({
+  .pipe(gulpEjs({
     moduleName: 'templates'
   }))
   .pipe(gulp.dest('test'));
@@ -28,7 +28,8 @@ gulp.task('ejsTemplate', function () {
 
 `test/fixtures/header.html`:
 ```html
-<p><%= it.name || 'gulp' %> module</p>
+<p><%= it.title || 'gulp' %> module</p>
+<%- include('user.html', it.user) %>
 ```
 `test/fixtures/user-list.html`:
 ```html
@@ -57,25 +58,40 @@ precompile to `test/templates.js`:
   'use strict';
   var templates = {};
 
-  templates['header'] = function(it) {
+  templates['header']  = templates['header.html'] = function(it) {
     var locals = it, __output = "";
-    ;__output += "<p>";;__output += escape(it.name || 'gulp');__output += " module</p>\n";
+    var include = function(tplName, data) { return render(tplName, data); }
+    ;__output += "<p>";;__output += escape(it.title || 'gulp');__output += " module</p>\n";;__output = [__output, include('user.html', it.user)].join("");__output += "\n";
     return __output.trim();
   };
 
-  templates['user-list'] = function(it) {
+  templates['user-list']  = templates['user-list.html'] = function(it) {
     var locals = it, __output = "";
     ;__output += "<ul>\n  ";; users.forEach(function(user) { ;__output += "    <li>\n      ";;__output += escape(user.name);__output += "\n    </li>\n  ";; }) ;__output += "</ul>\n";
     return __output.trim();
   };
 
-  templates['user'] = function(it) {
+  templates['user']  = templates['user.html'] = function(it) {
     var locals = it, __output = "";
     ;__output += "<h1>";;__output += escape(it.name);__output += "</h1>\n";
     return __output.trim();
   };
 
-  return templates;
+  var ejs = {
+    locals: {},
+    get: getTpl,
+    render: render
+  };
+  return ejs;
+
+  function render(tplName, data) {
+    var it  = copy({}, ejs.locals);
+    return getTpl(tplName)(copy(it, data));
+  }
+
+  function getTpl(tplName) {
+    return templates[tplName];
+  }
 
   function escape(markup) {
     if (!markup) return '';
@@ -86,23 +102,72 @@ precompile to `test/templates.js`:
       .replace(/'/g, '&#39;')
       .replace(/"/g, '&quot;');
   }
+
+  function copy(to, from) {
+    from = from || {};
+    for (var key in from) to[key] = from[key];
+    return to;
+  }
 }));
+
 ```
 
 
-## Options
+## API
 
-### moduleName
+```js
+var gulpEjs = require('gulp-ejs-template');
+
+gulp.task('ejsTemplate', function () {
+  return gulp.src('test/fixtures/*.html')
+    .pipe(gulpEjs({/*options*/}))
+    .pipe(gulp.dest('test'));
+});
+```
+
+### options.moduleName
 
 *Optional*, Type: `String`, Default: `'templates'`.
 
 Name of the templates module.
 
-### delimiter
+### options.delimiter
 
 *Optional*, Type: `String`, Default: `%`.
 
 ejs's delimiter.
+
+### templates funciton
+
+```js
+var ejs = require('templates.js');
+```
+
+### ejs.locals = {}
+
+```js
+ejs.locals = {
+  local: 'en',
+  __: function(i18nStr) {/* i18n function */}
+}
+```
+
+### ejs.get(tplName)
+
+```js
+var tplFunction = ejs.get('header');
+```
+
+### ejs.render(tplName, data)
+
+```js
+var tpl = ejs.render('header', {
+  title: 'gulp-ejs-template',
+  user: {
+    name: 'zensh'
+  }
+});
+```
 
 ## License
 

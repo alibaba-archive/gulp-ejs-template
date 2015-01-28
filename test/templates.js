@@ -13,25 +13,40 @@
   'use strict';
   var templates = {};
 
-  templates['header'] = function(it) {
+  templates['header']  = templates['header.html'] = function(it) {
     var locals = it, __output = "";
-    ;__output += "<p>";;__output += escape(it.name || 'gulp');__output += " module</p>\n";
+    var include = function(tplName, data) { return render(tplName, data); }
+    ;__output += "<p>";;__output += escape(it.title || 'gulp');__output += " module</p>\n";;__output = [__output, include('user.html', it.user)].join("");__output += "\n";
     return __output.trim();
   };
   
-  templates['user-list'] = function(it) {
+  templates['user-list']  = templates['user-list.html'] = function(it) {
     var locals = it, __output = "";
     ;__output += "<ul>\n  ";; users.forEach(function(user) { ;__output += "    <li>\n      ";;__output += escape(user.name);__output += "\n    </li>\n  ";; }) ;__output += "</ul>\n";
     return __output.trim();
   };
   
-  templates['user'] = function(it) {
+  templates['user']  = templates['user.html'] = function(it) {
     var locals = it, __output = "";
     ;__output += "<h1>";;__output += escape(it.name);__output += "</h1>\n";
     return __output.trim();
   };
 
-  return templates;
+  var ejs = {
+    locals: {},
+    get: getTpl,
+    render: render
+  };
+  return ejs;
+
+  function render(tplName, data) {
+    var it  = copy({}, ejs.locals);
+    return getTpl(tplName)(copy(it, data));
+  }
+
+  function getTpl(tplName) {
+    return templates[tplName];
+  }
 
   function escape(markup) {
     if (!markup) return '';
@@ -41,5 +56,11 @@
       .replace(/>/g, '&gt;')
       .replace(/'/g, '&#39;')
       .replace(/"/g, '&quot;');
+  }
+
+  function copy(to, from) {
+    from = from || {};
+    for (var key in from) to[key] = from[key];
+    return to;
   }
 }));

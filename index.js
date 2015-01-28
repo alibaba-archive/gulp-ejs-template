@@ -13,7 +13,7 @@ var gutil = require('gulp-util');
 var through = require('through2');
 var ejs = require('./lib/ejs');
 var packageName = require('./package.json').name;
-var templatesTpl = fs.readFileSync('./lib/templates.js', {encoding: 'utf8'});
+var templatesTpl = fs.readFileSync(path.join(__dirname,'./lib/templates.js'), {encoding: 'utf8'});
 
 module.exports = function(options) {
   options = options || {};
@@ -21,7 +21,7 @@ module.exports = function(options) {
   var joinedContent = '';
   var moduleName = options.moduleName || 'templates';
   var templates = templatesTpl.replace('moduleName', moduleName);
-  var contentTpl = 'templates[\'%s\'] = %s;\n\n';
+  var contentTpl = 'templates[\'%s\']  = templates[\'%s\'] = %s;\n\n';
   var joinedFile = new gutil.File({
     cwd: __dirname,
     base: __dirname,
@@ -34,7 +34,7 @@ module.exports = function(options) {
 
     var name = path.relative(file.base, file.path);
     var tpl = new ejs(file.contents.toString('utf8'), options.delimiter);
-    joinedContent += util.format(contentTpl, normalizeName(name), tpl.compile());
+    joinedContent += util.format(contentTpl, normalName(name), fullName(name), tpl.compile());
     next();
   }, function() {
     joinedContent = joinedContent.trim().replace(/^/gm, '  ');
@@ -43,7 +43,11 @@ module.exports = function(options) {
     this.push(null);
   });
 
-  function normalizeName(name) {
-    return name.replace('\\', '/').replace(path.extname(name), '');
+  function fullName(name) {
+    return name.replace('\\', '/');
+  }
+
+  function normalName(name) {
+    return fullName(name).replace(path.extname(name), '');
   }
 };

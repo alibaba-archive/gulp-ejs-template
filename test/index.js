@@ -2,7 +2,7 @@
 
 var gulp = require('gulp');
 var clean = require('gulp-clean');
-var ejsTemplate = require('../index');
+var gulpEjs = require('../index');
 var gulpSequence = require('gulp-sequence');
 
 module.exports = function () {
@@ -14,7 +14,7 @@ module.exports = function () {
 
   gulp.task('ejsTemplate', function () {
     return gulp.src('test/fixtures/*.html')
-    .pipe(ejsTemplate())
+    .pipe(gulpEjs())
     .pipe(gulp.dest('test'));
   });
 
