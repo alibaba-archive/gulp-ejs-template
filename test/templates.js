@@ -16,19 +16,19 @@
   templates['header']  = templates['header.html'] = function(it) {
     var locals = it, __output = "";
     var include = function(tplName, data) { return render(tplName, data); }
-    ;__output += "<p>";;__output += escape(it.title || 'gulp');__output += " module</p>\n";;__output = [__output, include('user.html', it.user)].join("");__output += "\n";
+    ;__output += "<p>";;__output += escape(locals.title || 'gulp');__output += " module</p>\n";;__output = [__output, include('user.html', locals.user)].join("");__output += "\n";
     return __output.trim();
   };
   
   templates['user-list']  = templates['user-list.html'] = function(it) {
     var locals = it, __output = "";
-    ;__output += "<ul>\n  ";; users.forEach(function(user) { ;__output += "    <li>\n      ";;__output += escape(user.name);__output += "\n    </li>\n  ";; }) ;__output += "</ul>\n";
+    ;__output += "<ul>\n  ";; locals.users.forEach(function(user) { ;__output += "    <li>\n      ";;__output += escape(user.name);__output += "\n    </li>\n  ";; }) ;__output += "</ul>\n";
     return __output.trim();
   };
   
   templates['user']  = templates['user.html'] = function(it) {
     var locals = it, __output = "";
-    ;__output += "<h1>";;__output += escape(it.name);__output += "</h1>\n";
+    ;__output += "<h1>";;__output += escape(locals.name);__output += "</h1>\n";
     return __output.trim();
   };
 

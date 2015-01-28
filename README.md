@@ -2,6 +2,11 @@ gulp-ejs-template
 ====
 > Precompile EJS templates to a JS file.
 
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+
+## Only support v2.x https://github.com/mde/ejs.
+
 ## Install
 
 Install with [npm](https://npmjs.org/package/gulp-ejs-template)
@@ -28,13 +33,13 @@ gulp.task('ejsTemplate', function () {
 
 `test/fixtures/header.html`:
 ```html
-<p><%= it.title || 'gulp' %> module</p>
-<%- include('user.html', it.user) %>
+<p><%= locals.title || 'gulp' %> module</p>
+<%- include('user.html', locals.user) %>
 ```
 `test/fixtures/user-list.html`:
 ```html
 <ul>
-  <% users.forEach(function(user) { -%>
+  <% locals.users.forEach(function(user) { -%>
     <li>
       <%= user.name %>
     </li>
@@ -43,7 +48,7 @@ gulp.task('ejsTemplate', function () {
 ```
 `test/fixtures/user.html`:
 ```html
-<h1><%= it.name %></h1>
+<h1><%= locals.name %></h1>
 ```
 
 precompile to `test/templates.js`:
@@ -61,19 +66,19 @@ precompile to `test/templates.js`:
   templates['header']  = templates['header.html'] = function(it) {
     var locals = it, __output = "";
     var include = function(tplName, data) { return render(tplName, data); }
-    ;__output += "<p>";;__output += escape(it.title || 'gulp');__output += " module</p>\n";;__output = [__output, include('user.html', it.user)].join("");__output += "\n";
+    ;__output += "<p>";;__output += escape(locals.title || 'gulp');__output += " module</p>\n";;__output = [__output, include('user.html', locals.user)].join("");__output += "\n";
     return __output.trim();
   };
 
   templates['user-list']  = templates['user-list.html'] = function(it) {
     var locals = it, __output = "";
-    ;__output += "<ul>\n  ";; users.forEach(function(user) { ;__output += "    <li>\n      ";;__output += escape(user.name);__output += "\n    </li>\n  ";; }) ;__output += "</ul>\n";
+    ;__output += "<ul>\n  ";; locals.users.forEach(function(user) { ;__output += "    <li>\n      ";;__output += escape(user.name);__output += "\n    </li>\n  ";; }) ;__output += "</ul>\n";
     return __output.trim();
   };
 
   templates['user']  = templates['user.html'] = function(it) {
     var locals = it, __output = "";
-    ;__output += "<h1>";;__output += escape(it.name);__output += "</h1>\n";
+    ;__output += "<h1>";;__output += escape(locals.name);__output += "</h1>\n";
     return __output.trim();
   };
 
@@ -172,3 +177,9 @@ var tpl = ejs.render('header', {
 ## License
 
 MIT © [Teambition](http://teambition.com)
+
+[npm-url]: https://npmjs.org/package/gulp-ejs-template
+[npm-image]: http://img.shields.io/npm/v/gulp-ejs-template.svg
+
+[travis-url]: https://travis-ci.org/teambition/gulp-ejs-template
+[travis-image]: http://img.shields.io/travis/teambition/gulp-ejs-template.svg
