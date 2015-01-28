@@ -13,21 +13,20 @@ var gutil = require('gulp-util');
 var through = require('through2');
 var ejs = require('./lib/ejs');
 var packageName = require('./package.json').name;
+var templatesTpl = fs.readFileSync('./lib/templates.js', {encoding: 'utf8'});
 
 module.exports = function(options) {
   options = options || {};
 
   var joinedContent = '';
   var moduleName = options.moduleName || 'templates';
+  var templates = templatesTpl.replace('moduleName', moduleName);
   var contentTpl = 'templates[\'%s\'] = %s;\n\n';
-  var templates = fs.readFileSync('./lib/templates.js', {encoding: 'utf8'});
   var joinedFile = new gutil.File({
     cwd: __dirname,
     base: __dirname,
     path: path.join(__dirname, moduleName + '.js')
   });
-
-  templates = templates.replace('moduleName', moduleName);
 
   return through.obj(function(file, encoding, next) {
     if (file.isNull()) return next();
